@@ -13,12 +13,12 @@ How to solve the potential problem of mass unemployment in the post-AI era?
 | Mary   | qwen/qwen3-max            | English  | Sociologist / Labor Rights Advocate |
 
 ### Debate Structure
-- **Number of Rounds**: 3
-- **Speaker Sequence**: Peter → Paul → Mary (repeats each round)
+- **Number of Rounds**: 1
+- **Speaker Sequence**: Peter → Paul → Mary
 - **Words per Speech**: 1000 words (approximately)
 
 ### Research Phase
-- **Research Rounds**: 2 rounds per debater
+- **Research Rounds**: 1 round per debater
 - Each debater conducts independent research before the debate begins
 - Research materials are stored in each debater's own folder for reference during speeches
 
