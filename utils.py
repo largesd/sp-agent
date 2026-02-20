@@ -40,6 +40,7 @@ def parse_objective(content: str) -> dict[str, Any]:
     result = {
         "topic": "",
         "debaters": [],
+        "proposal_agent": None,
         "num_rounds": 3,
         "speaker_sequence": [],
         "words_per_speech": 1000,
@@ -55,16 +56,43 @@ def parse_objective(content: str) -> dict[str, Any]:
     # Look for table rows after "| Alias" header
     debater_pattern = r"\|\s*(\w+)\s*\|\s*([^|]+)\|\s*(\w+)\s*\|\s*([^|]+)\|"
     matches = re.findall(debater_pattern, content)
+    
+    # Separate debaters and proposal agent
+    debater_matches = []
+    proposal_match = None
     for match in matches:
         alias, model, language, role = match
         # Skip header row if present
         if alias.lower() not in ["alias", "---", "-"]:
-            result["debaters"].append({
-                "alias": alias.strip(),
-                "model": model.strip(),
-                "language": language.strip(),
-                "role": role.strip(),
-            })
+            if alias.lower() == "proposal":
+                proposal_match = match
+            else:
+                debater_matches.append(match)
+    
+    for match in debater_matches:
+        alias, model, language, role = match
+        result["debaters"].append({
+            "alias": alias.strip(),
+            "model": model.strip(),
+            "language": language.strip(),
+            "role": role.strip(),
+        })
+    
+    # Extract proposal agent if defined
+    if proposal_match:
+        alias, model, language, role = proposal_match
+        result["proposal_agent"] = {
+            "alias": alias.strip(),
+            "model": model.strip(),
+            "language": language.strip(),
+            "role": role.strip(),
+        }
+        # Try to extract words limit for proposal agent
+        proposal_words_match = re.search(r"\|\s*Proposal\s*\|\s*[^|]+\|\s*(\d+)\s*\|", content)
+        if proposal_words_match:
+            result["proposal_agent"]["words_limit"] = int(proposal_words_match.group(1))
+        else:
+            result["proposal_agent"]["words_limit"] = 3000
     
     # Extract number of rounds
     rounds_match = re.search(r"\*\*Number of Rounds\*\*:\s*(\d+)", content)
@@ -165,4 +193,48 @@ SPEECH GUIDELINES:
 Write your complete speech now:
 """
     
+    return prompt
+
+
+def format_proposal_prompt(topic: str, research_materials: str, speeches: str, 
+                           words_limit: int = 3000) -> str:
+    """Generate proposal synthesis prompt for the proposal agent."""
+    prompt = f"""You are tasked with synthesizing a comprehensive proposal to address the following problem:
+
+"{topic}"
+
+You have access to:
+1. Research materials prepared by all debaters
+2. All speeches from the debate rounds
+
+YOUR TASK: Create an objective, comprehensive proposal of approximately {words_limit} words that:
+1. Synthesizes the key findings from the research materials
+2. Incorporates valid arguments from all debaters
+3. Provides concrete, actionable recommendations
+4. Maintains neutrality without favoring any particular debater
+5. Addresses the problem based solely on the evidence presented
+
+STRUCTURE YOUR PROPOSAL AS FOLLOWS:
+1. Executive Summary - Brief overview of the problem and proposed solution
+2. Key Findings - Major points from research and debate
+3. Proposed Solutions - Detailed recommendations with supporting rationale
+4. Implementation Plan - Steps to put the proposal into action
+5. Conclusion - Final thoughts and call to action
+
+---
+
+RESEARCH MATERIALS FROM ALL DEBATERS:
+
+{research_materials}
+
+---
+
+DEBATE SPEECHES:
+
+{speeches}
+
+---
+
+Write your comprehensive proposal now:
+"""
     return prompt

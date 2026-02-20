@@ -12,13 +12,25 @@ How to solve the potential problem of mass unemployment in the post-AI era?
 | Paul   | moonshotai/kimi-k2.5      | English  | Technologist / Entrepreneur         |
 | Mary   | qwen/qwen3-max            | English  | Sociologist / Labor Rights Advocate |
 
+### Proposal Agent
+| Alias    | Model Name              | Words Limit | Role/Expertise                           |
+|----------|-------------------------|-------------|------------------------------------------|
+| Proposal | qwen/qwen3-max          | 3000        | Objective Synthesizer / Solution Drafter |
+
+**Proposal Agent Responsibilities:**
+- Study all research materials from debaters (`agents/{alias}/research/`)
+- Analyze all debate speeches (`speeches/round_{n}/`)
+- Synthesize a comprehensive, objective proposal to solve the problem
+- Remain neutral without personal preference or bias toward any debater
+- Base the proposal solely on the materials presented in the debate
+
 ### Debate Structure
-- **Number of Rounds**: 1
+- **Number of Rounds**: 3
 - **Speaker Sequence**: Peter → Paul → Mary
 - **Words per Speech**: 1000 words (approximately)
 
 ### Research Phase
-- **Research Rounds**: 1 round per debater
+- **Research Rounds**: 2 round per debater
 - Each debater conducts independent research before the debate begins
 - Research materials are stored in each debater's own folder for reference during speeches
 
@@ -40,6 +52,17 @@ How to solve the potential problem of mass unemployment in the post-AI era?
    - Their own research materials (`agents/{alias}/research/`)
 3. Each speech is saved to `speeches/round_{n}/{alias}_speech.md`
 
+### Phase 3: Proposal (Post-Debate)
+1. The Proposal agent reviews:
+   - All research materials from all debaters (`agents/{alias}/research/`)
+   - All debate speeches across all rounds (`speeches/round_{n}/`)
+2. The Proposal agent synthesizes an objective proposal that:
+   - Addresses the problem based on evidence presented in the debate
+   - Incorporates valid points from all debaters
+   - Provides concrete, actionable recommendations
+   - Maintains neutrality without favoring any particular debater
+3. The final proposal is saved to `agents/Proposal/proposal.md`
+
 ## Output Structure
 ```
 project/
@@ -48,8 +71,10 @@ project/
 │   │   └── research/
 │   ├── Paul/
 │   │   └── research/
-│   └── Mary/
-│       └── research/
+│   ├── Mary/
+│   │   └── research/
+│   └── Proposal/
+│       └── proposal.md
 └── speeches/
     ├── round_1/
     ├── round_2/
